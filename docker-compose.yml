@@ -1,0 +1,13 @@
+version: '3.8'
+services:
+  web:
+    image: smhw3565/substracker:latest
+    container_name: substracker
+    ports:
+      - "5000:5000"
+    restart: unless-stopped
+    environment:
+      - FLASK_APP=app.py
+      - FLASK_RUN_HOST=0.0.0.0
+      - FLASK_ENV=production
+    
