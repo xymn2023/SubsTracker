@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>订阅管理系统</title>
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+  <style>
+    .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); transition: all 0.3s; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+    .btn-danger { background: linear-gradient(135deg, #f87171 0%, #dc2626 100%); transition: all 0.3s; }
+    .btn-danger:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+    .btn-success { background: linear-gradient(135deg, #34d399 0%, #059669 100%); transition: all 0.3s; }
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+    .btn-warning { background: linear-gradient(135deg, #fbbf24 0%, #d97706 100%); transition: all 0.3s; }
+    .btn-warning:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+    .btn-info { background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 100%); transition: all 0.3s; }
+    .btn-info:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); }
+    .table-container { box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
+    .modal-container { backdrop-filter: blur(8px); }
+    .readonly-input { background-color: #f8fafc; border-color: #e2e8f0; cursor: not-allowed; }
+    .error-message { font-size: 0.875rem; margin-top: 0.25rem; display: none; }
+    .error-message.show { display: block; }
+    .toast { position: fixed; top: 20px; right: 20px; padding: 12px 20px; border-radius: 8px; color: white; font-weight: 500; z-index: 1000; transform: translateX(400px); transition: all 0.3s ease-in-out; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); }
+    .toast.show { transform: translateX(0); }
+    .toast.success { background-color: #10b981; }
+    .toast.error { background-color: #ef4444; }
+    .toast.info { background-color: #3b82f6; }
+    .toast.warning { background-color: #f59e0b; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen">
+  <div id="toast-container"></div>
+  <nav class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex justify-between h-16">
+        <div class="flex items-center">
+          <i class="fas fa-calendar-check text-indigo-600 text-2xl mr-2"></i>
+          <span class="font-bold text-xl text-gray-800">订阅管理系统</span>
+        </div>
+        <div class="flex items-center space-x-4">
+          <a href="/admin" class="text-indigo-600 border-b-2 border-indigo-600 px-3 py-2 rounded-md text-sm font-medium">
+            <i class="fas fa-list mr-1"></i>订阅列表
+          </a>
+          <a href="/admin/config" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            <i class="fas fa-cog mr-1"></i>系统配置
+          </a>
+          <a href="/api/logout" class="text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium">
+            <i class="fas fa-sign-out-alt mr-1"></i>退出登录
+          </a>
+        </div>
+      </div>
+    </div>
+  </nav>
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-800">订阅列表</h2>
+      <div class="flex space-x-2">
+        <button id="addSubscriptionBtn" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium flex items-center">
+          <i class="fas fa-plus mr-2"></i>添加新订阅
+        </button>
+      </div>
+    </div>
+    <div class="table-container bg-white rounded-lg overflow-hidden">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">名称</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">类型</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">到期时间</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">提醒设置</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+          </tr>
+        </thead>
+        <tbody id="subscriptionsBody" class="bg-white divide-y divide-gray-200">
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <!-- 添加/编辑订阅的模态框 -->
+  <div id="subscriptionModal" class="fixed inset-0 bg-gray-600 bg-opacity-50 modal-container hidden flex items-center justify-center z-50">
+    <div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
+      <div class="bg-gray-50 px-6 py-4 border-b border-gray-200 rounded-t-lg">
+        <div class="flex items-center justify-between">
+          <h3 id="modalTitle" class="text-lg font-medium text-gray-900">添加新订阅</h3>
+          <button id="closeModal" class="text-gray-400 hover:text-gray-600">
+            <i class="fas fa-times text-xl"></i>
+          </button>
+        </div>
+      </div>
+      <form id="subscriptionForm" class="p-6 space-y-6">
+        <input type="hidden" id="subscriptionId">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">订阅名称 *</label>
+            <input type="text" id="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div class="error-message text-red-500"></div>
+          </div>
+          <div>
+            <label for="customType" class="block text-sm font-medium text-gray-700 mb-1">订阅类型</label>
+            <input type="text" id="customType" placeholder="例如：流媒体、云服务、软件等" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div class="error-message text-red-500"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div>
+            <label for="startDate" class="block text-sm font-medium text-gray-700 mb-1">开始日期</label>
+            <input type="date" id="startDate" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div class="error-message text-red-500"></div>
+          </div>
+          <div>
+            <label for="periodValue" class="block text-sm font-medium text-gray-700 mb-1">周期数值 *</label>
+            <input type="number" id="periodValue" min="1" value="1" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <div class="error-message text-red-500"></div>
+          </div>
+          <div>
+            <label for="periodUnit" class="block text-sm font-medium text-gray-700 mb-1">周期单位 *</label>
+            <select id="periodUnit" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+              <option value="day">天</option>
+              <option value="month" selected>月</option>
+              <option value="year">年</option>
+            </select>
+            <div class="error-message text-red-500"></div>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="expiryDate" class="block text-sm font-medium text-gray-700 mb-1">到期日期 *</label>
+            <input type="date" id="expiryDate" required class="readonly-input w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none">
+            <div class="error-message text-red-500"></div>
+          </div>
+          <div class="flex items-end">
+            <button type="button" id="calculateExpiryBtn" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium h-10">
+              <i class="fas fa-calculator mr-2"></i>自动计算到期日期
+            </button>
+          </div>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="reminderDays" class="block text-sm font-medium text-gray-700 mb-1">提前提醒天数</label>
+            <input type="number" id="reminderDays" min="0" value="7" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500">
+            <p class="text-xs text-gray-500 mt-1">0 = 仅到期日当天提醒，1+ = 提前N天开始提醒</p>
+            <div class="error-message text-red-500"></div>
+          </div>
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-3">选项设置</label>
+            <div class="space-y-2">
+              <label class="inline-flex items-center">
+                <input type="checkbox" id="isActive" checked class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                <span class="ml-2 text-sm text-gray-700">启用订阅</span>
+              </label>
+              <label class="inline-flex items-center">
+                <input type="checkbox" id="autoRenew" checked class="form-checkbox h-4 w-4 text-indigo-600 rounded border-gray-300 focus:ring-indigo-500">
+                <span class="ml-2 text-sm text-gray-700">自动续订</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        <div>
+          <label for="notes" class="block text-sm font-medium text-gray-700 mb-1">备注</label>
+          <textarea id="notes" rows="3" placeholder="可添加相关备注信息..." class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"></textarea>
+          <div class="error-message text-red-500"></div>
+        </div>
+        <div class="flex justify-end space-x-3 pt-4 border-t border-gray-200">
+          <button type="button" id="cancelBtn" class="px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50">取消</button>
+          <button type="submit" class="btn-primary text-white px-4 py-2 rounded-md text-sm font-medium">
+            <i class="fas fa-save mr-2"></i>保存
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+  <script src="/static/admin.js"></script>
+</body>
+</html> 
