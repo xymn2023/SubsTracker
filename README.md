@@ -61,6 +61,7 @@ python app.py
 - 登录页：http://localhost:5000/
 - 管理后台：http://localhost:5000/admin
 - 系统配置：http://localhost:5000/admin/config
+- 默认账号：admin   默认密码：password
 
 ## 5. 配置说明
 
