@@ -1,5 +1,38 @@
 # SubsTracker 订阅管理系统（Python Flask 版）使用说明
 
+![image](https://github.com/user-attachments/assets/22ff1592-7836-4f73-aa13-24e9d43d7064)
+
+系统配置,修改账号密码,以及配置tg通知的信息
+
+![image](https://github.com/user-attachments/assets/f6db2089-28a1-439d-9de0-412ee4b2807f)
+
+配置完成可以点击测试通知,查看是否能够正常通知,然后就可以正常添加订阅使用了!
+
+![image](https://github.com/user-attachments/assets/af530379-332c-4482-9e6e-229a9e24775e)
+
+## ✨ 特性
+
+- 🔔 **自动提醒**: 在订阅到期前自动发送Telegram通知
+- 📊 **订阅管理**: 直观的Web界面管理所有订阅
+- 🔄 **周期计算**: 智能计算循环订阅的下一个周期
+- 📱 **响应式设计**: 完美适配移动端和桌面设备
+
+✅ 订阅列表按到期日期升序排序 
+
+✅ 修复了提醒天数逻辑（reminderDays: 0 只在到期日提醒） 
+
+✅ 添加了自动续费切换功能（autoRenew 字段） 
+
+✅ 增强了测试通知功能（在配置页面独立测试按钮） 
+
+✅ 实现了Toast通知系统 
+
+✅ 表单验证和错误处理 
+
+✅ 安全配置（不返回敏感信息） 
+
+
+
 ## 1. 环境要求
 
 - Python 3.7 及以上
