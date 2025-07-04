@@ -133,6 +133,12 @@ docker仓库地址
 https://hub.docker.com/r/smhw3565/substracker
 ```
 
+访问地址：
+
+```
+http://localhost:5000/
+```
+
 
 
 
