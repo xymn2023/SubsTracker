@@ -10,6 +10,8 @@
 
 ![image](https://github.com/user-attachments/assets/af530379-332c-4482-9e6e-229a9e24775e)
 
+Docker更新新地址：https://github.com/xymn2023/SubsTracker-Docker
+
 ## ✨ 特性
 
 - 🔔 **自动提醒**: 在订阅到期前自动发送Telegram通知
