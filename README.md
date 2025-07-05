@@ -10,7 +10,7 @@
 
 ![image](https://github.com/user-attachments/assets/af530379-332c-4482-9e6e-229a9e24775e)
 
-Docker更新新地址：[SubsTracker-Docker](https://github.com/xymn2023/SubsTracker-Docker)
+Docker更新地址：[SubsTracker-Docker](https://github.com/xymn2023/SubsTracker-Docker)
 
 ## ✨ 特性
 
