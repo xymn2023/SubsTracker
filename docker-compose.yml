@@ -1,7 +1,7 @@
 version: '3.8'
 services:
   web:
-    image: smhw3565/substracker:latest
+    image: smhw3565/substracker:sub
     container_name: substracker
     ports:
       - "5000:5000"
