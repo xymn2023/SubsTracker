@@ -145,6 +145,9 @@ http://localhost:5000/
 
 
 
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=xymn2023/SubsTracker&type=Date)](https://www.star-history.com/#xymn2023/SubsTracker&Date)
 
 
 
